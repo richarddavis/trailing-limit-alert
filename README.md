@@ -8,11 +8,13 @@ pushes notifications when:
 
 Runs every 5 min on GitHub Actions – no server, no cost.
 
+**Thresholds support fractional values**: Use `2.5` for 2.5% alerts, `0.5` for 0.5% alerts, etc.
+
 ## Quick start
 
 ```bash
-git clone https://github.com/yourname/btc-trailing-alert.git
-cd btc-trailing-alert
+git clone https://github.com/richarddavis/trailing-limit-alert.git
+cd trailing-limit-alert
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 export PUSHOVER_APP_TOKEN=xxx  PUSHOVER_USER_KEY=yyy
@@ -76,6 +78,9 @@ python trailing_alerts.py --reset
 
 # View current state
 cat .btc_state.json
+
+# Or use the status checker for formatted output
+python check_status.py
 ```
 
 ### Environment variables
@@ -93,7 +98,22 @@ All CLI options have environment equivalents:
 - `ASSET`: Asset to track (default: bitcoin)
 - `CURRENCY`: Currency for pricing (default: usd)
 
-## How it works
+## Monitoring
+
+### Check Current Status
+
+```bash
+# Quick status check with formatted output
+python check_status.py
+
+# Raw state file
+cat .btc_state.json
+
+# GitHub Actions logs
+# Go to Actions → "BTC Trailing Alerts" → click any run
+```
+
+### State Tracking
 
 The bot maintains a simple state file (`.btc_state.json`) with:
 - `high`: Highest price seen in current session
@@ -138,6 +158,7 @@ btc-trailing-alert/
 ├── tests/
 │   └── test_logic.py       ← deterministic unit tests
 ├── trailing_alerts.py      ← main script
+├── check_status.py         ← status monitoring script
 ├── requirements.txt        ← pinned dependencies
 ├── README.md               ← this file
 └── .gitignore
