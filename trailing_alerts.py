@@ -18,8 +18,8 @@ API_URL   = os.getenv("PRICE_API_URL",
           "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
 ASSET, CUR = os.getenv("ASSET","bitcoin"), os.getenv("CURRENCY","usd")
 
-DROP_PCT = float(os.getenv("DROP_THRESHOLD_PERCENT", 5))
-RISE_PCT = float(os.getenv("RISE_THRESHOLD_PERCENT", 5))
+DROP_PCT = float(os.getenv("DROP_THRESHOLD_PERCENT") or 5)
+RISE_PCT = float(os.getenv("RISE_THRESHOLD_PERCENT") or 5)
 STATE = pathlib.Path(".btc_state.json")
 
 PUSHOVER_APP = os.getenv("PUSHOVER_APP_TOKEN")
