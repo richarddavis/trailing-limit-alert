@@ -11,10 +11,12 @@ on:
 jobs:
   alert:
     runs-on: ubuntu-latest
-    permissions: { contents: write }      # needed to commit state
+    permissions: { contents: write }
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - uses: actions/setup-python@v5
       with: { python-version: '3.11' }
@@ -32,10 +34,15 @@ jobs:
         RESET_STATE: ${{ github.event.inputs.reset }}
       run: python trailing_alerts.py
 
-    - name: Commit updated state
+    - name: Commit state changes
+      if: always()
       run: |
-        git config --global user.name  'bot'
-        git config --global user.email 'actions@users.noreply.github.com'
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add .btc_state.json || true
-        git commit -m 'state: update [skip ci]' || exit 0
-        git push 
+        if git diff --staged --quiet; then
+          echo "No state changes to commit"
+        else
+          git commit -m "state: update BTC high/low [skip ci]" || exit 0
+          git push || exit 0
+        fi 
