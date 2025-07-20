@@ -59,41 +59,29 @@ def main(argv=None):
 
     st = load_state()
     high, low = st["high"], st["low"]
-    
-    print(f"DEBUG: Loaded state - high: {high}, low: {low}")
 
     # Handle manual overrides / resets
     if args.reset or os.getenv("RESET_STATE") == "1":
         high = low = 0
-        print("DEBUG: Reset triggered")
     if args.set_high or os.getenv("SET_HIGH"):
         high = float(args.set_high or os.getenv("SET_HIGH"))
-        print(f"DEBUG: Set high to {high}")
     if args.set_low  or os.getenv("SET_LOW"):
         low  = float(args.set_low  or os.getenv("SET_LOW"))
-        print(f"DEBUG: Set low to {low}")
 
     price = args.price if args.price is not None else fetch_price()
-    print(f"DEBUG: Current price: {price}")
 
     # Update extrema
-    old_high, old_low = high, low
     high = max(high, price) if not args.set_high else high
     low  = price if low==0 else min(low, price)   if not args.set_low  else low
-    print(f"DEBUG: After extrema update - high: {high} (was {old_high}), low: {low} (was {old_low})")
 
     # ▼ drop from high
     if DROP_PCT>0 and high and price <= high*(1-DROP_PCT/100):
-        print(f"DEBUG: Drop alert triggered! {high} -> {price}")
         alert(f"▼ BTC −{DROP_PCT}%: {high:,.0f}→{price:,.0f} USD")
         high = price  # reset after alert
-        print(f"DEBUG: Reset high to {high}")
     # ▲ rise from low
     if RISE_PCT>0 and low  and price >= low*(1+RISE_PCT/100):
-        print(f"DEBUG: Rise alert triggered! {low} -> {price}")
         alert(f"▲ BTC +{RISE_PCT}%: {low:,.0f}→{price:,.0f} USD")
         low = price   # reset
-        print(f"DEBUG: Reset low to {low}")
 
     save_state({"high":high,"low":low})
     print(f"${price:,.0f} | high {high:,.0f} | low {low:,.0f}")
