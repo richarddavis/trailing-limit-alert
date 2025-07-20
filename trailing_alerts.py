@@ -84,12 +84,16 @@ def main(argv=None):
 
     # ▼ drop from high
     if DROP_PCT>0 and high and price <= high*(1-DROP_PCT/100):
+        print(f"DEBUG: Drop alert triggered! {high} -> {price}")
         alert(f"▼ BTC −{DROP_PCT}%: {high:,.0f}→{price:,.0f} USD")
         high = price  # reset after alert
+        print(f"DEBUG: Reset high to {high}")
     # ▲ rise from low
     if RISE_PCT>0 and low  and price >= low*(1+RISE_PCT/100):
+        print(f"DEBUG: Rise alert triggered! {low} -> {price}")
         alert(f"▲ BTC +{RISE_PCT}%: {low:,.0f}→{price:,.0f} USD")
         low = price   # reset
+        print(f"DEBUG: Reset low to {low}")
 
     save_state({"high":high,"low":low})
     print(f"${price:,.0f} | high {high:,.0f} | low {low:,.0f}")
