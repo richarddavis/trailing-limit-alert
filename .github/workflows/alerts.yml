@@ -1,0 +1,41 @@
+name: BTC Trailing Alerts
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      set_high:  { description: 'Override high', required: false }
+      set_low:   { description: 'Override low',  required: false }
+      reset:     { description: 'Reset highs/lows?', type: boolean, required: false }
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    permissions: { contents: write }      # needed to commit state
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with: { python-version: '3.11' }
+
+    - run: pip install -r requirements.txt
+
+    - name: Run alert script
+      env:
+        PUSHOVER_APP_TOKEN:   ${{ secrets.PUSHOVER_APP_TOKEN }}
+        PUSHOVER_USER_KEY:    ${{ secrets.PUSHOVER_USER_KEY }}
+        DROP_THRESHOLD_PERCENT: ${{ secrets.DROP_THRESHOLD_PERCENT }}
+        RISE_THRESHOLD_PERCENT: ${{ secrets.RISE_THRESHOLD_PERCENT }}
+        SET_HIGH:   ${{ github.event.inputs.set_high }}
+        SET_LOW:    ${{ github.event.inputs.set_low }}
+        RESET_STATE:${{ github.event.inputs.reset }}
+      run: python trailing_alerts.py
+
+    - name: Commit updated state
+      run: |
+        git config --global user.name  'bot'
+        git config --global user.email 'actions@users.noreply.github.com'
+        git add .btc_state.json || true
+        git commit -m 'state: update [skip ci]' || exit 0
+        git push 
