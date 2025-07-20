@@ -55,5 +55,4 @@ venv.bak/
 .DS_Store
 
 # Application specific
-.btc_state.json
 .env 
