@@ -61,7 +61,8 @@ def main(argv=None):
     high, low = st["high"], st["low"]
 
     # Handle manual overrides / resets
-    if args.reset or os.getenv("RESET_STATE") == "1":
+    reset_flag = args.reset or (os.getenv("RESET_STATE") or "").lower() in ("1", "true", "yes")
+    if reset_flag:
         high = low = 0
     if args.set_high or os.getenv("SET_HIGH"):
         high = float(args.set_high or os.getenv("SET_HIGH"))
